@@ -44,7 +44,10 @@
                                              (list parent-full-name))
                                          (list name))
                                  name)))
-  
+
+  (when (getenv "PLT_EXPANDER_TRACE")
+    (eprintf "compile-module: ~a\n" full-module-name))
+
   ;; Extract submodules; each list is (cons linklet-directory-key compiled-in-memory)
   (define compiled-submodules (parsed-module-compiled-submodules p))
   (define (get-submodules star?)
@@ -94,7 +97,10 @@
                                     #:need-compiled-submodule-rename? need-compiled-submodule-rename?)
   (performance-region
    ['compile 'module]
-   
+
+   (when (getenv "PLT_EXPANDER_TRACE")
+     (eprintf "compile-module-from-parsed: ~a\n" full-module-name))
+
    (define enclosing-self (compile-context-module-self cctx))
    (define self (parsed-module-self p))
    (define requires (parsed-module-requires p))

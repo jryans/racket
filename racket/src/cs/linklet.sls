@@ -70,7 +70,6 @@
           schemify-table
           call-with-module-prompt)
   (import (chezpart)
-          (only (chezscheme) printf)
           (rename (rumble)
                   [raise-argument-error raise-argument-error/primitive]
                   [raise-argument-error/user raise-argument-error]
@@ -103,6 +102,7 @@
                 find-system-path
                 build-path
                 format
+                eprintf
                 error-print-source-location
                 ;; Used by cross-compiler:
                 get-original-error-port
@@ -230,7 +230,7 @@
      [(what v) (show show-on? what v)]
      [(on? what v)
       (when on?
-        (printf ";; ~a ---------------------\n" what)
+        (eprintf ";; ~a ---------------------\n" what)
         (call-with-system-wind
          (lambda ()
            (parameterize ([print-gensym gensym-mode]
@@ -259,15 +259,15 @@
                                                                   (optimize-level))]
                                               [compile-procedure-realm realm])
                                  (let* ([print-header (lambda ()
-                                                        (printf ";;")
+                                                        (eprintf ";;")
                                                         (for-each (lambda (p)
                                                                     (define pass
                                                                       (if (eq? p #t) 'all p))
-                                                                    (printf " ~a" pass))
+                                                                    (eprintf " ~a" pass))
                                                                   (if assembly-on?
                                                                       (append passes-on '(assembly))
                                                                       passes-on))
-                                                        (printf " ---------------------\n"))]
+                                                        (eprintf " ---------------------\n"))]
                                         [-compile (lambda (e)
                                                     (if (not (null? passes-on))
                                                         (parameterize ([print-gensym gensym-mode]
