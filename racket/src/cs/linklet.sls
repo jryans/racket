@@ -279,7 +279,7 @@
                                    (when (or (not (null? passes-on)) assembly-on?)
                                      (print-header))
                                    (if assembly-on?
-                                       (parameterize ([#%$assembly-output (#%current-output-port)])
+                                       (parameterize ([#%$assembly-output (#%current-error-port)])
                                         (-compile e))
                                        (-compile e))))))]
      [(e) (compile* e #f #f)]))
