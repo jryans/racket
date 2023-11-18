@@ -21,7 +21,7 @@
 ;; This uses the same output path as Chez's nanopass tracer,
 ;; which helps ensure trace logs from both this layer and Chez
 ;; appear in the order they occurred.
-(define (trace-printf fmt . args)
+(define (trace-printf-core fmt . args)
   ;; Schemify appears to handle this in a sane way:
   ;;   - When targeting CS, only the CS branch is kept
   ;;   - What targeting BC, all branches are kept
@@ -37,6 +37,11 @@
         (apply fprintf (current-error-port) fmt args)))]
     [else
      (apply eprintf fmt args)]))
+
+(define (trace-printf fmt . args)
+  (when (getenv "PLT_TRACE_TIMES")
+    (trace-printf-core "[~a] " (current-inexact-monotonic-milliseconds)))
+  (apply trace-printf-core fmt args))
 
 ;; This is exposed for other parts of CS internals (but not Racket)
 ;; that may wish to optionally print trace output.

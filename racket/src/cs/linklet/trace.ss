@@ -14,9 +14,15 @@
 ;; This uses the same output path as Chez's nanopass tracer,
 ;; which helps ensure trace logs from both this layer and Chez
 ;; appear in the order they occurred.
-(define trace-printf
+(define trace-printf-core
   (lambda (fmt . args)
     (apply #%fprintf (#%current-error-port) fmt args)))
+
+(define trace-printf
+  (lambda (fmt . args)
+    (when (getenv "PLT_TRACE_TIMES")
+      (trace-printf-core "[~a] " (current-inexact-monotonic-milliseconds)))
+    (apply trace-printf-core fmt args)))
 
 ;; This is exposed for other parts of CS internals (but not Racket)
 ;; that may wish to optionally print trace output.
