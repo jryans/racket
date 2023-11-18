@@ -28,7 +28,8 @@
          "../expand/parsed.rkt"
          "../expand/top-portal-syntax.rkt"
          "../common/performance.rkt"
-         "../compile/correlated-linklet.rkt")
+         "../compile/correlated-linklet.rkt"
+         "../common/trace.rkt")
 
 (provide eval
          compile
@@ -70,8 +71,8 @@
 ;; [Don't use keyword arguments here, because the function is
 ;;  exported for use by an embedding runtime system.]
 (define (compile s [ns (current-namespace)] [serializable? #t] [expand expand])
-  (when (getenv "PLT_EXPANDER_TRACE")
-    (eprintf "compile\n"))
+  (guarded-trace-printf "compile\n")
+
   (define to-correlated-linklet? (and serializable?
                                       (not (current-compile-target-machine))))
   ;; The given `s` might be an already-compiled expression because it
@@ -106,8 +107,8 @@
 (define (compile-single s ns expand
                         #:serializable? serializable?
                         #:to-correlated-linklet? to-correlated-linklet?)
-  (when (getenv "PLT_EXPANDER_TRACE")
-    (eprintf "compile-single\n"))
+  (guarded-trace-printf "compile-single\n")
+
   (define exp-s (expand s ns #f #t serializable? to-correlated-linklet?))
   (let loop ([exp-s exp-s])
     (cond
@@ -218,8 +219,8 @@
                        #:quick-immediate? [quick-immediate? #t]
                        #:serializable? [serializable? #f] ; for module+submodule expansion
                        #:observer observer)
-  (when (getenv "PLT_EXPANDER_TRACE")
-    (eprintf "per-top-level\n"))
+  (guarded-trace-printf "per-top-level\n")
+
   (define s (maybe-intro given-s ns))
   (define ctx (make-expand-context ns #:observer observer))
   (define phase (namespace-phase ns))

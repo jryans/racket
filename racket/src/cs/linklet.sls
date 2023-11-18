@@ -102,7 +102,6 @@
                 find-system-path
                 build-path
                 format
-                eprintf
                 error-print-source-location
                 ;; Used by cross-compiler:
                 get-original-error-port
@@ -230,16 +229,18 @@
      [(what v) (show show-on? what v)]
      [(on? what v)
       (when on?
-        (eprintf ";; ~a ---------------------\n" what)
+        (trace-printf ";; ~a ---------------------\n" what)
         (call-with-system-wind
          (lambda ()
            (parameterize ([print-gensym gensym-mode]
                           [print-extended-identifiers #t])
              (pretty-print (strip-jit-wrapper
                             (strip-nested-annotations
-                             (correlated->annotation v))))))))
+                             (correlated->annotation v)))
+                           (#%current-error-port))))))
       v]))
 
+  (include "linklet/trace.ss")
   (include "linklet/check.ss")
   (include "linklet/version.ss")
   (include "linklet/write.ss")
@@ -259,15 +260,15 @@
                                                                   (optimize-level))]
                                               [compile-procedure-realm realm])
                                  (let* ([print-header (lambda ()
-                                                        (eprintf ";;")
+                                                        (trace-printf ";;")
                                                         (for-each (lambda (p)
                                                                     (define pass
                                                                       (if (eq? p #t) 'all p))
-                                                                    (eprintf " ~a" pass))
+                                                                    (trace-printf " ~a" pass))
                                                                   (if assembly-on?
                                                                       (append passes-on '(assembly))
                                                                       passes-on))
-                                                        (eprintf " ---------------------\n"))]
+                                                        (trace-printf " ---------------------\n"))]
                                         [-compile (lambda (e)
                                                     (if (not (null? passes-on))
                                                         (parameterize ([print-gensym gensym-mode]

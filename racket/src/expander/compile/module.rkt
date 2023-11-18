@@ -24,7 +24,8 @@
          "linklet.rkt"
          "correlated-linklet.rkt"
          "../eval/reflect.rkt"
-         "../eval/reflect-name.rkt")
+         "../eval/reflect-name.rkt"
+         "../common/trace.rkt")
 
 (provide compile-module)
 
@@ -45,8 +46,7 @@
                                          (list name))
                                  name)))
 
-  (when (getenv "PLT_EXPANDER_TRACE")
-    (eprintf "compile-module: ~a\n" full-module-name))
+  (guarded-trace-printf "compile-module: ~a\n" full-module-name)
 
   ;; Extract submodules; each list is (cons linklet-directory-key compiled-in-memory)
   (define compiled-submodules (parsed-module-compiled-submodules p))
@@ -98,8 +98,7 @@
   (performance-region
    ['compile 'module]
 
-   (when (getenv "PLT_EXPANDER_TRACE")
-     (eprintf "compile-module-from-parsed: ~a\n" full-module-name))
+   (guarded-trace-printf "compile-module-from-parsed: ~a\n" full-module-name)
 
    (define enclosing-self (compile-context-module-self cctx))
    (define self (parsed-module-self p))
