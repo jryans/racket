@@ -41,8 +41,8 @@
                            immutable-vector?
                            random random-seed
                            box? unbox set-box! immutable-box? mutable-box?
-			   get-thread-id
-			   threaded?
+                           get-thread-id
+                           threaded?
                            map for-each andmap ormap
                            char-general-category
                            make-vector make-string
