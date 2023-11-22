@@ -108,6 +108,7 @@
                         #:serializable? serializable?
                         #:to-correlated-linklet? to-correlated-linklet?)
   (guarded-trace-printf "compile-single\n")
+  (guarded-trace-printf "  syntax-srcloc: ~a\n" (syntax-srcloc s))
 
   (define exp-s (expand s ns #f #t serializable? to-correlated-linklet?))
   (let loop ([exp-s exp-s])

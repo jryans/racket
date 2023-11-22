@@ -22,7 +22,8 @@
          "../expand/protect.rkt"
          "../expand/env.rkt"
          "../expand/binding-to-module.rkt"
-         "../host/linklet.rkt")
+         "../host/linklet.rkt"
+         "../common/trace.rkt")
 
 (provide make-empty-namespace
          
@@ -117,6 +118,8 @@
                               #:copy-variable-phase-level [copy-variable-phase-level #f]
                               #:copy-variable-as-constant? [copy-variable-as-constant? #f]
                               #:skip-variable-phase-level [skip-variable-phase-level #f])
+  (guarded-trace-printf "do-namespace-require for ~a: ~a\n" who req)
+
   (check who namespace? ns)
   (define ctx-stx (add-scopes empty-syntax
                               (root-expand-context-module-scopes

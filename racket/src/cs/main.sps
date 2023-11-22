@@ -228,12 +228,16 @@
    (define (configure-runtime m)
      ;; New-style configuration through a `configure-runtime` submodule:
      (let ([config-m (module-path-index-join '(submod "." configure-runtime) m)])
+       (guarded-trace-printf "Might load via module-declared?: ~a\n" config-m)
        (when (module-declared? config-m #t)
+         (guarded-trace-printf "Found new-style configuration, calling dynamic-require: ~a\n" config-m)
          (dynamic-require config-m #f)))
      ;; Old-style configuration with module language info:
+     (guarded-trace-printf "Might load via module->language-info: ~a\n" m)
      (let ([info (module->language-info m #t)])
        (when (and (vector? info) (= 3 (vector-length info)))
          (let* ([info-load (lambda (info)
+                             (guarded-trace-printf "Found old-style configuration, calling dynamic-require: ~a\n" (vector-ref info 0))
                              ((dynamic-require (vector-ref info 0) (vector-ref info 1)) (vector-ref info 2)))]
                 [get (info-load info)]
                 [infos (get 'configure-runtime '())])
@@ -247,8 +251,10 @@
    (define (namespace-require+ mod)
      (let ([m (module-path-index-join mod #f)])
        (when need-runtime-configure?
+         (guarded-trace-printf "namespace-require+ calling configure-runtime: ~a\n" m)
          (configure-runtime m)
          (set! need-runtime-configure? #f))
+       (guarded-trace-printf "namespace-require+ calling namespace-require: ~a\n" m)
        (namespace-require m)
        ;; Run `main` submodule, if any:
        (let ([main-m (module-path-index-join '(submod "." main) m)])
@@ -329,6 +335,7 @@
                  loads)))
 
    (include "main/help.ss")
+   (include "main/trace.ss")
 
    (define-syntax string-case
      ;; Assumes that `arg` is a variable
@@ -374,21 +381,25 @@
              arg
              [("-l" "--lib")
               (let-values ([(lib-name rest-args) (next-arg "library name" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -l / --lib: (lib ~a)\n" lib-name)
                 (add-namespace-require-load! `(lib ,lib-name) lib-name)
                 (no-init! saw)
                 (flags-loop rest-args (see saw 'non-config 'lib)))]
              [("-t" "--require")
               (let-values ([(file-name rest-args) (next-arg "file name" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -t / --require: (file ~a)\n" file-name)
                 (add-namespace-require-load! `(file ,file-name) file-name)
                 (no-init! saw)
                 (flags-loop rest-args (see saw 'non-config 'lib)))]
              [("-p")
               (let-values ([(package rest-args) (next-arg "package" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -p: (planet ~a)\n" package)
                 (add-namespace-require-load! `(planet ,package) package)
                 (no-init! saw)
                 (flags-loop rest-args (see saw 'non-config 'lib)))]
              [("-u" "--require-script")
               (let-values ([(file-name rest-args) (next-arg "file name" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -u / --require-script: (file ~a)\n" file-name)
                 (add-namespace-require-load! `(file ,file-name) file-name)
                 (no-init! saw)
                 (check-path-arg file-name "file name" arg within-arg)
@@ -396,11 +407,13 @@
                 (flags-loop (cons "--" rest-args) (see saw 'non-config 'lib)))]
              [("-f" "--load")
               (let-values ([(file-name rest-args) (next-arg "file name" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -f / --load: (load ~a)\n" file-name)
                 (set! loads (cons (lambda () (load file-name))
                                   loads))
                 (flags-loop rest-args (see saw 'non-config 'top)))]
              [("-r" "--script")
               (let-values ([(file-name rest-args) (next-arg "file name" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -r / --script: (load ~a)\n" file-name)
                 (set! loads (cons (lambda () (load file-name))
                                   loads))
                 (check-path-arg file-name "file name" arg within-arg)
@@ -408,6 +421,7 @@
                 (flags-loop (cons "--" rest-args) (see saw 'non-config 'top)))]
              [("-e" "--eval")
               (let-values ([(expr rest-args) (next-arg "expression" arg within-arg args)])
+                (guarded-trace-printf "Adding load via -e / --eval: ~a\n" expr)
                 (set! loads
                       (cons
                        (lambda ()
@@ -438,6 +452,7 @@
                             [(n rest-args) (next-arg "starting and ending offsets" arg within-arg (cons arg rest-args))]
                             [(m rest-args) (next-arg "first ending offset" arg within-arg (cons arg rest-args))]
                             [(p rest-args) (next-arg "second ending offset" arg within-arg (cons arg rest-args))])
+                (guarded-trace-printf "Adding load via -k / -y: ~a ~a ~a ~a\n" f n m p)
                 (let* ([add-segment-offset
                         (lambda (s what)
                           (let ([n (#%string->number s)])
@@ -458,6 +473,7 @@
                 (no-init! saw)
                 (flags-loop rest-args (see saw 'non-config)))]
              [("-m" "--main")
+              (guarded-trace-printf "Adding load via -m: (call-main)\n")
               (set! loads (cons (lambda () (call-main))
                                 loads))
               (flags-loop (cdr args) (see saw 'non-config 'top))]
@@ -958,7 +974,8 @@
 
          (when init-library
            (namespace-require+ init-library))
-         
+
+         (guarded-trace-printf "Running loads\n")
          (call-with-continuation-prompt
           (lambda ()
             (for-each (lambda (ld) (ld))

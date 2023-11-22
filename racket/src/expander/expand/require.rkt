@@ -16,7 +16,8 @@
          "require+provide.rkt"
          "env.rkt"
          "../common/module-path.rkt"
-         "../syntax/bulk-binding.rkt")
+         "../syntax/bulk-binding.rkt"
+         "../common/trace.rkt")
 
 (provide parse-and-perform-requires!
          perform-initial-require!
@@ -304,6 +305,9 @@
                           #:who who)
   (performance-region
    ['expand 'require]
+
+   (guarded-trace-printf "perform-require! for ~a: ~a\n" who mpi)
+
    (define module-name (module-path-index-resolve mpi #t orig-s))
    (define bind-in-stx (if (adjust-rename? adjust)
                            (adjust-rename-to-id adjust)

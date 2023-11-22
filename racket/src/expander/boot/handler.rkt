@@ -18,7 +18,8 @@
          "../read/api.rkt"
          "../read/primitive-parameter.rkt"
          "load-handler.rkt"
-         "../common/performance.rkt")
+         "../common/performance.rkt"
+         "../common/trace.rkt")
 
 (provide boot
          seal
@@ -34,6 +35,9 @@
                                           (current-directory))])
                         (t)))])
     (lambda (path expect-module)
+      ; (guarded-trace-printf "default-load/use-compiled\n")
+      ; (guarded-trace-printf "  path: ~a\n" path)
+      ; (guarded-trace-printf "  expect-module: ~a\n" expect-module)
       (unless (path-string? path)
         (raise-argument-error 'load/use-compiled "path-string?" path))
       (unless (or (not expect-module)
@@ -47,6 +51,8 @@
       (define name (and expect-module (current-module-declare-name)))
       (define ns-hts (and name (registry-table-ref (namespace-module-registry (current-namespace)))))
       (define use-path/src (and ns-hts (hash-ref (cdr ns-hts) name #f)))
+      ; (guarded-trace-printf "  name: ~a\n" name)
+      ; (guarded-trace-printf "  use-path/src: ~a\n" use-path/src)
       (if use-path/src
           ;; Use previous decision of .zo vs. source:
           (parameterize ([current-module-declare-source (cadr use-path/src)])
@@ -57,6 +63,9 @@
                                              #f
                                              (current-compiled-file-roots)
                                              (use-compiled-file-paths))])
+            ; (guarded-trace-printf "  the-module-declare-source: ~a\n" the-module-declare-source)
+            ; (guarded-trace-printf "  file-type: ~a\n" file-type)
+            ; (guarded-trace-printf "  the-path: ~a\n" the-path)
             (when the-path
               (define-values (_base orig-file dir?) (split-path path))
               (define base (if (eq? _base 'relative) 'same _base))

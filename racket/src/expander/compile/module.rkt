@@ -7,6 +7,7 @@
          "../common/phase.rkt"
          "../namespace/core.rkt"
          "../namespace/module.rkt"
+         "../namespace/namespace.rkt"
          "../common/module-path.rkt"
          "../common/performance.rkt"
          "../expand/parsed.rkt"
@@ -46,7 +47,10 @@
                                          (list name))
                                  name)))
 
-  (guarded-trace-printf "compile-module: ~a\n" full-module-name)
+  (guarded-trace-printf "compile-module\n")
+  (guarded-trace-printf "  full-module-name: ~a\n" full-module-name)
+  (define s (parsed-s p))
+  (guarded-trace-printf "  syntax-srcloc: ~a\n" (syntax-srcloc s))
 
   ;; Extract submodules; each list is (cons linklet-directory-key compiled-in-memory)
   (define compiled-submodules (parsed-module-compiled-submodules p))
