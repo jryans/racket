@@ -12,6 +12,7 @@
 ;; messages from several different layers:
 ;;
 ;;   - `cs/linklet.sls`
+;;   - `cs/main.sps`
 ;;   - `expander/**`
 ;;   - `ChezScheme/s/**`
 ;;
