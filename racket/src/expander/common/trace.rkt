@@ -29,17 +29,24 @@
   ;; TODO: Can this be simplified using `#%` primitive prefix...?
   (case (system-type 'vm)
     [(chez-scheme)
+     ;; In some contexts (like `module-path-index-resolve`),
+     ;; `call-with-system-wind` appears to be `#f` until after
+     ;; `namespace-init!` completes
      (define call-with-system-wind (primitive-lookup 'call-with-system-wind))
-     (define apply (primitive-lookup 'apply))
-     (define fprintf (primitive-lookup 'fprintf))
-     (define current-error-port (primitive-lookup 'current-error-port))
-     (define flush-output-port (primitive-lookup 'flush-output-port))
-     (call-with-system-wind
-      (lambda ()
-        (apply fprintf (current-error-port) fmt args)
-        ;; `flush-output-port` complains of a contract violation...
-        ;; Is this somehow a Racket flush implementation?
-        #;(flush-output-port (current-error-port))))]
+     (cond
+      [call-with-system-wind
+       (define apply (primitive-lookup 'apply))
+       (define fprintf (primitive-lookup 'fprintf))
+       (define current-error-port (primitive-lookup 'current-error-port))
+       (define flush-output-port (primitive-lookup 'flush-output-port))
+       (call-with-system-wind
+         (lambda ()
+           (apply fprintf (current-error-port) fmt args)
+           ;; `flush-output-port` complains of a contract violation...
+           ;; Is this somehow a Racket flush implementation?
+           #;(flush-output-port (current-error-port))))]
+      [else
+       (apply eprintf fmt args)])]
     [else
      (apply eprintf fmt args)]))
 
