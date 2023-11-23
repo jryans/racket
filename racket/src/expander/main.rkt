@@ -42,7 +42,8 @@
          (only-in "common/performance.rkt" performance-place-init!)
          (only-in "eval/shadow-directory.rkt" shadow-directory-place-init!)
          (only-in "common/phase+space.rkt" phase+space-place-init!)
-         (only-in "expand/configure.rkt" set-load-configure-expand!))
+         (only-in "expand/configure.rkt" set-load-configure-expand!)
+         (only-in "common/linklet-show.rkt" install-linklet-show-enabled!))
 
 ;; All bindings provided by this module must correspond to variables
 ;; (as opposed to syntax). Provided functions must not accept keyword
@@ -126,6 +127,8 @@
          compile-keep-source-locations! ; to enable if the back end wants them
 
          expander-place-init!
+
+         install-linklet-show-enabled!
 
          ;; The remaining functions are provided for basic testing
          ;; (such as "demo.rkt")

@@ -26,7 +26,8 @@
          "correlated-linklet.rkt"
          "../eval/reflect.rkt"
          "../eval/reflect-name.rkt"
-         "../common/trace.rkt")
+         "../common/trace.rkt"
+         "../common/linklet-show.rkt")
 
 (provide compile-module)
 
@@ -48,9 +49,44 @@
                                  name)))
 
   (guarded-trace-printf "compile-module\n")
-  (guarded-trace-printf "  full-module-name: ~a\n" full-module-name)
+  (guarded-trace-printf "  full-module-name: ~s\n" full-module-name)
   (define s (parsed-s p))
   (guarded-trace-printf "  syntax-srcloc: ~a\n" (syntax-srcloc s))
+
+  (define (dcm)
+    (do-compile-module p cctx
+                       #:full-module-name full-module-name
+                       #:force-linklet-directory? force-linklet-directory?
+                       #:serializable? serializable?
+                       #:to-correlated-linklet? to-correlated-linklet?
+                       #:modules-being-compiled modules-being-compiled
+                       #:need-compiled-submodule-rename? need-compiled-submodule-rename?))
+
+  (cond
+    [(getenv "PLT_LINKLET_SHOW_MODULE")
+     => (lambda (show-module-str)
+          (guarded-trace-printf "  show-module-str: ~s\n" show-module-str)
+          (define port (open-input-string show-module-str))
+          (define show-module (read port))
+          (guarded-trace-printf "  show-module: ~s\n" show-module)
+          ;; For some reason, they aren't equal as data...?
+          (define show-this-module (equal? show-module full-module-name))
+          (define show-this-module-str (equal? (format "~a" show-module)
+                                               (format "~a" full-module-name)))
+          (guarded-trace-printf "  show-this-module: ~a\n" show-this-module)
+          (guarded-trace-printf "  show-this-module-str: ~a\n" show-this-module-str)
+          (parameterize ([installed-linklet-show-enabled show-this-module-str])
+            (dcm)))]
+    [else (dcm)]))
+
+(define (do-compile-module p cctx
+                           #:full-module-name full-module-name
+                           #:force-linklet-directory? [force-linklet-directory? #f]
+                           #:serializable? [serializable? #f]
+                           #:to-correlated-linklet? [to-correlated-linklet? #f]
+                           #:modules-being-compiled [modules-being-compiled (make-hasheq)]
+                           #:need-compiled-submodule-rename? [need-compiled-submodule-rename? #t])
+  (guarded-trace-printf "  installed-linklet-show-enabled: ~a\n" (installed-linklet-show-enabled))
 
   ;; Extract submodules; each list is (cons linklet-directory-key compiled-in-memory)
   (define compiled-submodules (parsed-module-compiled-submodules p))

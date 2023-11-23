@@ -49,6 +49,8 @@
           primitive-in-category?
           primitive-lookup
 
+          linklet-show-enabled ; not exported to racket
+
           omit-debugging?             ; not exported to racket
           platform-independent-zo-mode? ; not exported to racket
           linklet-performance-init!   ; not exported to racket
@@ -224,11 +226,13 @@
                        (pair? passes-on)
                        assembly-on?
                        (getenv "PLT_LINKLET_SHOW")))
+  (define linklet-show-enabled
+    (make-parameter #t (lambda (v) (and v #t)) 'linklet-show-enabled))
   (define show
     (case-lambda
      [(what v) (show show-on? what v)]
      [(on? what v)
-      (when on?
+      (when (and (linklet-show-enabled) on?)
         (trace-printf ";; ~a ---------------------\n" what)
         (call-with-system-wind
          (lambda ()

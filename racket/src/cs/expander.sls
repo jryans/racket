@@ -142,4 +142,6 @@
                                          (eqv? (string-ref str 1) #\%))))))
 
   ;; `set-maybe-raise-missing-module!` is also from the `io` library
-  (set-maybe-raise-missing-module! maybe-raise-missing-module))
+  (set-maybe-raise-missing-module! maybe-raise-missing-module)
+
+  (install-linklet-show-enabled! linklet-show-enabled))
