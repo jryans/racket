@@ -196,7 +196,8 @@
                                 #:unsafe? unsafe?
                                 #:load-modules? #t
                                 #:namespace ns
-                                #:realm realm))
+                                #:realm realm
+                                #:phase phase))
       (values phase (cons linklet new-module-use*s))))
 
   (define h/new-body-linklets

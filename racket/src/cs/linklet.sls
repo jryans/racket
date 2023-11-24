@@ -233,7 +233,7 @@
      [(what v) (show show-on? what v)]
      [(on? what v)
       (when (and (linklet-show-enabled) on?)
-        (trace-printf ";; ~a ---------------------\n" what)
+        (trace-printf ";; compile-linklet: step: ~a ---------------------\n" what)
         (call-with-system-wind
          (lambda ()
            (parameterize ([print-gensym gensym-mode]
@@ -264,7 +264,7 @@
                                                                   (optimize-level))]
                                               [compile-procedure-realm realm])
                                  (let* ([print-header (lambda ()
-                                                        (trace-printf ";;")
+                                                        (trace-printf ";; compile-linklet: passes:")
                                                         (for-each (lambda (p)
                                                                     (define pass
                                                                       (if (eq? p #t) 'all p))
@@ -602,6 +602,9 @@
                             (make-hash)
                             ;; For speed and more flexible sharing: a weak, place-local cache
                             (get-nonserializable-sfd-cache)))
+
+      (guarded-trace-printf ";; ~a: linklet: ~a\n" who name)
+
       (performance-region
        'schemify
        (define jitify-mode?

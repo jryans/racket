@@ -24,7 +24,8 @@
          "expr.rkt"
          "extra-inspector.rkt"
          "correlate.rkt"
-         "correlated-linklet.rkt")
+         "correlated-linklet.rkt"
+         "../common/trace.rkt")
 
 (provide compile-forms
          compile-module-linklet
@@ -285,7 +286,8 @@
                                    #:unsafe? (and unsafe?-box (unbox unsafe?-box))
                                    #:load-modules? #f
                                    #:namespace (compile-context-namespace cctx)
-                                   #:realm realm)]))
+                                   #:realm realm
+                                   #:phase phase)]))
       (values phase (cons linklet new-module-use*s))))
   
   (define body-linklets
@@ -407,7 +409,10 @@
                                 #:unsafe? unsafe?
                                 #:load-modules? load-modules?
                                 #:namespace namespace
-                                #:realm realm)
+                                #:realm realm
+                                #:phase phase)
+  (guarded-trace-printf ";; compile-module-linklet: phase: ~a\n" phase)
+
   (define-values (linklet new-module-use*s)
     (performance-region
      ['compile '_ 'linklet]

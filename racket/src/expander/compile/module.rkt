@@ -48,10 +48,11 @@
                                          (list name))
                                  name)))
 
-  (guarded-trace-printf "compile-module\n")
-  (guarded-trace-printf "  full-module-name: ~s\n" full-module-name)
+  ;; TODO: Show this whenever linklet would show things
+  ;; (instead of using a separate env var)
+  (guarded-trace-printf ";; compile-module: module: ~s\n" full-module-name)
   (define s (parsed-s p))
-  (guarded-trace-printf "  syntax-srcloc: ~a\n" (syntax-srcloc s))
+  (guarded-trace-printf ";;  syntax-srcloc: ~a\n" (syntax-srcloc s))
 
   (define (dcm)
     (do-compile-module p cctx
