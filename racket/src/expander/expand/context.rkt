@@ -35,7 +35,7 @@
 ;; expansion and parsing, which is useful in the common case that
 ;; expanded code is being sent directly the the compiler.
 ;;
-;; If only-immediate?` is set, then only immediate macro uses are
+;; If `only-immediate?` is set, then only immediate macro uses are
 ;; expanded. That mode overrides `to-parsed?`, since it's common to
 ;; partially expand forms on the way to a parsed result.
 

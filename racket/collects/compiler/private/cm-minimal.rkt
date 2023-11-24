@@ -23,12 +23,12 @@
 ;; generates and consults ".dep" files to manage dependencies. Two
 ;; design choices/constraints complicate its job:
 ;;
-;;  - Dependencies are recorded as unordered. Consequenlty, CM can't
+;;  - Dependencies are recorded as unordered. Consequently, CM can't
 ;;    recur in a simple way on dependencies, because a change in one
 ;;    dependency may cause another former dependency to be removed.
 ;;
 ;;    As a result, CM has two paths to explore a dependency tree: an
-;;    "optimistic" mode that doesn't build anytihing but just checks
+;;    "optimistic" mode that doesn't build anything but just checks
 ;;    whether everything has stayed the same, and a general mode that
 ;;    rebuilds.
 ;;
