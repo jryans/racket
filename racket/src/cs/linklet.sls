@@ -233,7 +233,8 @@
      [(what v) (show show-on? what v)]
      [(on? what v)
       (when (and (linklet-show-enabled) on?)
-        (trace-printf ";; compile-linklet: step: ~a ---------------------\n" what)
+        (trace-printf ";; compile-linklet: step: ~a\n" what)
+        (trace-printf ";; ---------------------\n")
         (call-with-system-wind
          (lambda ()
            (parameterize ([print-gensym gensym-mode]
@@ -272,7 +273,7 @@
                                                                   (if assembly-on?
                                                                       (append passes-on '(assembly))
                                                                       passes-on))
-                                                        (trace-printf " ---------------------\n"))]
+                                                        (trace-printf "\n;; ---------------------\n"))]
                                         [-compile (lambda (e)
                                                     (if (not (null? passes-on))
                                                         (parameterize ([print-gensym gensym-mode]
