@@ -126,7 +126,7 @@
           (let-values ([val* (let ([th (lambda () (apply pass arg*))])
                                (if pass-time? ($pass-time pass-name th) (th)))])
             (when (memq pass-name (tracer))
-              (fprintf (current-error-port) "output of ~s:\n" pass-name)
+              (fprintf (current-error-port) ";; output of ~s:\n" pass-name)
               (printer val*))
             (apply values val*))))
       (define-syntax xpass
