@@ -38,13 +38,9 @@
        (define apply (primitive-lookup 'apply))
        (define fprintf (primitive-lookup 'fprintf))
        (define current-error-port (primitive-lookup 'current-error-port))
-       (define flush-output-port (primitive-lookup 'flush-output-port))
        (call-with-system-wind
          (lambda ()
-           (apply fprintf (current-error-port) fmt args)
-           ;; `flush-output-port` complains of a contract violation...
-           ;; Is this somehow a Racket flush implementation?
-           #;(flush-output-port (current-error-port))))]
+           (apply fprintf (current-error-port) fmt args)))]
       [else
        (apply eprintf fmt args)])]
     [else

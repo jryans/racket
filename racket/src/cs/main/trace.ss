@@ -17,8 +17,7 @@
 ;; appear in the order they occurred.
 (define trace-printf-core
   (lambda (fmt . args)
-    (apply #%fprintf (#%current-error-port) fmt args)
-    (#%flush-output-port (#%current-error-port))))
+    (apply #%fprintf (#%current-error-port) fmt args)))
 
 (define trace-printf
   (lambda (fmt . args)
