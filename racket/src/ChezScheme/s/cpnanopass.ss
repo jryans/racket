@@ -8342,6 +8342,8 @@
              (let ([ptrace* (map CaseLambdaExpr le* func*)])
                (for-each resolve-funcrel! funcrel*)
                (when aop
+                 ;; TODO: Capture this, add header, move to after
+                 ;; regular pass output (or do that on the CE side...)
                  (for-each (lambda (ptrace) (ptrace aop)) ptrace*)
                  (flush-output-port aop))
                (local-label-func l)))])
